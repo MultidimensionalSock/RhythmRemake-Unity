@@ -53,7 +53,12 @@ public class MidiReader : MonoBehaviour
     NoteName[] lane4Notes = { NoteName.FSharp, NoteName.G, NoteName.GSharp };
 
     public event System.Action<List<NoteData>> NoteCall;
-    int BeatValue = 1;
+    public int BeatValue
+    {
+        get;
+        set;
+    }
+
 
     public void StartSong() 
     { 
@@ -63,12 +68,12 @@ public class MidiReader : MonoBehaviour
     public void PauseSong() { StopCoroutine(songCoroutine); }
 
 
-    void Start()
-    {
-        BeatValue = 0;
-        songData = new();
-        //SetMidiLocation("Assets/Midi/Vocaloid - 1925.mid", Resources.Load<AudioClip>("Assets/Midi/ytmp3free.cc_hatsune-miku-1925-english-subbed-youtubemp3free.org.mp3"));
-    }
+    //void Start()
+    //{
+    //    BeatValue = 1;
+    //    songData = new();
+    //    //SetMidiLocation("Assets/Midi/Vocaloid - 1925.mid", Resources.Load<AudioClip>("Assets/Midi/ytmp3free.cc_hatsune-miku-1925-english-subbed-youtubemp3free.org.mp3"));
+    //}
 
     public void SetMidiLocation(string location, AudioClip song)
     {
