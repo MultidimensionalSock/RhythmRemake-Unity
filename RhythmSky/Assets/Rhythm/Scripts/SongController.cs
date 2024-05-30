@@ -1,6 +1,5 @@
 using System.Collections;
 using System.Collections.Generic;
-using UnityEditor.ShaderGraph.Internal;
 using UnityEngine;
 
 public class SongController : MonoBehaviour
@@ -9,13 +8,58 @@ public class SongController : MonoBehaviour
     [SerializeField] GameObject hitObject;
     [SerializeField] Material[] puckMaterials;
     [SerializeField] float puckSpeed;
+    public AudioClip songAudio;
+    AudioSource source;
+    bool paused = true;
+    MidiReader reader;
 
     void Start()
     {
-        MidiReader reader = GetComponent<MidiReader>();
-        reader.SetMidiLocation("Assets/Midi/Vocaloid - 1925.mid", null);
+        reader = GetComponent<MidiReader>();
+        reader.SetMidiLocation("Assets/Midi/Vocaloid - 1925.mid");
         reader.NoteCall += CreateNote;
+        StartSong();
+        source = GetComponent<AudioSource>();
+        source.clip = songAudio;
+    }
+
+    public void PauseSong()
+    {
+        paused = true;
+        reader.PauseSong();
+    }
+
+    public void StartSong()
+    {
         reader.StartSong();
+        StartCoroutine(startSongAudio());
+    }
+
+    private void FixedUpdate()
+    {
+        if (!paused)
+        {
+            if (!source.isPlaying)
+            {
+                Debug.Log("song has ended");
+                //end song and show score UI
+            }
+        }
+    }
+
+    IEnumerator startSongAudio()
+    {
+        float beforetime = Time.timeSinceLevelLoad;
+        float hitPointPos = transform.parent.GetChild(5).position.x;
+        //should change this to not be hard coded
+        float spawnPosition = -49;
+
+        float distanceToTravel = Mathf.Abs(spawnPosition - hitPointPos);
+        float time = distanceToTravel / puckSpeed;
+
+        yield return new WaitForSeconds(time - (Time.timeSinceLevelLoad - beforetime));
+        source.Play();
+        paused = false;
     }
 
     void CreateNote(List<NoteData> notes)
@@ -24,7 +68,8 @@ public class SongController : MonoBehaviour
         GameObject noteObject = null;
         foreach (NoteData note in notes)
         {
-            switch(note.LaneNo)
+            //should change the below to not be hard coded
+            switch (note.LaneNo)
             {
                 case 1:
                     noteObject = Instantiate(hitObject, new Vector3(-49.0f, -0.2f, 1.0f), Quaternion.identity);
@@ -46,7 +91,7 @@ public class SongController : MonoBehaviour
         }
         if (noteObject != null)
         {
-            noteObject.GetComponent<Rigidbody>().AddForce(new Vector3(puckSpeed, 0, 0));
+            noteObject.GetComponent<Rigidbody>().velocity = new Vector3(puckSpeed, 0, 0);
         }
     }
 

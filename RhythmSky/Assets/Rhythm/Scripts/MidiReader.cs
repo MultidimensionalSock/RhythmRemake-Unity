@@ -39,26 +39,21 @@ public struct NoteData
 public class MidiReader : MonoBehaviour
 {
     MidiFile midiFile;
-    AudioClip songAudio;
     TempoMap tempoMap;
     float BPM;
     int songsegments;
     public List<List<NoteData>> songData;
     Coroutine songCoroutine;
     bool loaded = false;
+
     
-    NoteName[] lane1Notes = { NoteName.A, NoteName.ASharp, NoteName.B };
-    NoteName[] lane2Notes = { NoteName.C, NoteName.CSharp, NoteName.D };
-    NoteName[] lane3Notes = { NoteName.DSharp, NoteName.E, NoteName.F };
-    NoteName[] lane4Notes = { NoteName.FSharp, NoteName.G, NoteName.GSharp };
+    NoteName[] lane1Notes = { NoteName.G, NoteName.E, NoteName.B };
+    NoteName[] lane2Notes = { NoteName.C, NoteName.GSharp, NoteName.ASharp };
+    NoteName[] lane3Notes = { NoteName.D, NoteName.F, NoteName.FSharp, };
+    NoteName[] lane4Notes = { NoteName.A, NoteName.CSharp, NoteName.DSharp };
 
     public event System.Action<List<NoteData>> NoteCall;
-    public int BeatValue
-    {
-        get;
-        set;
-    }
-
+    int BeatValue = 1;
 
     public void StartSong() 
     { 
@@ -67,19 +62,11 @@ public class MidiReader : MonoBehaviour
     public void RestartSong() { BeatValue = 1; StartSong(); }
     public void PauseSong() { StopCoroutine(songCoroutine); }
 
-
-    //void Start()
-    //{
-    //    BeatValue = 1;
-    //    songData = new();
-    //    //SetMidiLocation("Assets/Midi/Vocaloid - 1925.mid", Resources.Load<AudioClip>("Assets/Midi/ytmp3free.cc_hatsune-miku-1925-english-subbed-youtubemp3free.org.mp3"));
-    //}
-
-    public void SetMidiLocation(string location, AudioClip song)
+    public void SetMidiLocation(string location)
     {
         midiFile = MidiFile.Read(location);
         tempoMap = midiFile.GetTempoMap();
-        songAudio = song;
+        //songAudio = song;
         ReadMidiFile();
     }
 
@@ -95,7 +82,7 @@ public class MidiReader : MonoBehaviour
         }
         if (count > 1)
         {
-            Debug.Log("there is more than one tempo in this song");
+            Debug.Log("there is more than one tempo in this song, this cannot currently be handled");
             return;
         }
         else
@@ -114,15 +101,12 @@ public class MidiReader : MonoBehaviour
 
     void GetNotes()
     {
-        
         songData = new List<NoteData>[songsegments].ToList();
         var notes = midiFile.GetNotes();
         foreach (var note in notes)
         {
             double NoteStartInSeconds = TimeConverter.ConvertTo<MetricTimeSpan>(note.Time, tempoMap).TotalSeconds;
             int songBeat = (int)(NoteStartInSeconds / (60.0f / BPM));
-            //i dont know if this will work
-            //this is shwoing nullptr
             if (songData[songBeat] == null) { songData[songBeat] = new List<NoteData>(); }
             songData[songBeat].Add(new NoteData(
                     calculateLaneNumber(note),
@@ -132,13 +116,14 @@ public class MidiReader : MonoBehaviour
                     note.Length));
         }
 
-        Debug.Log(songData.Count);
-
-
-        //go through the note array
-        //find the time it happens at in seconds
-        //assign each note to a bpm based on its time stamp 
-        //go throgh and reduce the notes
+        //remove notes that would happen on the same lane at the same time 
+        foreach (List<NoteData> beatData in songData)
+        {
+            if (beatData != null)
+            {
+                beatData.DistinctBy(note => note.LaneNo);
+            }
+        }
     }
 
 
@@ -146,19 +131,16 @@ public class MidiReader : MonoBehaviour
     {
         while (loaded == false)
         {
-            Debug.Log("song data not loaded");
             yield return new WaitForFixedUpdate();
         }
         if (songData == null || songData.Count == 0)
         {
-            Debug.LogWarning("songdata is null");
+            Debug.LogWarning("Song data is null or empty, check if the midi file has been properly passed in");
             yield break;
         }
-        Debug.Log("the beat count is: " + BeatValue + ", and the songdata count is now: " + songData.Count);
         while (BeatValue < songsegments)
         {
             yield return new WaitForSeconds(60f / BPM);
-            Debug.Log("after the wait, the beat count is: " + BeatValue + ", and the songdata count is now: " + songData.Count);
             if (songData[BeatValue] != null)
             {
                 NoteCall?.Invoke(songData[BeatValue]);
