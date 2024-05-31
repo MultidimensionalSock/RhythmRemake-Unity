@@ -7,19 +7,19 @@ using UnityEngine.InputSystem;
 public class HitAreaFunctionality : MonoBehaviour
 {
     PlayerInput m_input;
-    Queue<NoteFunctionality> m_lane1notes;
-    Queue<NoteFunctionality> m_lane2notes;
-    Queue<NoteFunctionality> m_lane3notes;
-    Queue<NoteFunctionality> m_lane4notes;
+    List<NoteFunctionality> m_lane1notes;
+    List<NoteFunctionality> m_lane2notes;
+    List<NoteFunctionality> m_lane3notes;
+    List<NoteFunctionality> m_lane4notes;
 
     public event System.Action<Scores> ScoreEvent;
 
     private void OnEnable()
     {
-        m_lane1notes = new Queue<NoteFunctionality>();
-        m_lane2notes = new Queue<NoteFunctionality>();
-        m_lane3notes = new Queue<NoteFunctionality>();
-        m_lane4notes = new Queue<NoteFunctionality>();
+        m_lane1notes = new();
+        m_lane2notes = new();
+        m_lane3notes = new();
+        m_lane4notes = new();
         m_input = GetComponent<PlayerInput>();
         m_input.currentActionMap.FindAction("Lane 1").performed += ReactLane1;
         m_input.currentActionMap.FindAction("Lane 2").performed += ReactLane2;
@@ -30,11 +30,11 @@ public class HitAreaFunctionality : MonoBehaviour
     void ReactLane1(InputAction.CallbackContext context)
     {
         //play sound here
-        if (m_lane1notes.Count != 0)
-        {
-            ScoreEvent?.Invoke(m_lane1notes.Peek().React());
-            Destroy(m_lane1notes.Peek().gameObject);
-        }
+        if (m_lane1notes.Count == 0) return;
+        ScoreEvent?.Invoke(m_lane1notes[0].React());
+        GameObject obj = m_lane1notes[0].gameObject;
+        m_lane1notes.Remove(m_lane1notes[0]);
+        Destroy(obj);
 
     }
 
@@ -42,67 +42,76 @@ public class HitAreaFunctionality : MonoBehaviour
     {
         //play sound here
         if (m_lane2notes.Count == 0) return;
-        ScoreEvent?.Invoke(m_lane2notes.Peek().React());
-        Destroy(m_lane2notes.Peek().gameObject);
+        ScoreEvent?.Invoke(m_lane2notes[0].React());
+        GameObject obj = m_lane2notes[0].gameObject;
+        m_lane2notes.Remove(m_lane2notes[0]);
+        Destroy(obj);
     }
 
     void ReactLane3(InputAction.CallbackContext context)
     {
         //play sound here
         if (m_lane3notes.Count == 0) return;
-        ScoreEvent?.Invoke(m_lane3notes.Peek().React());
-        Destroy(m_lane3notes.Peek().gameObject);
+        ScoreEvent?.Invoke(m_lane3notes[0].React());
+        GameObject obj = m_lane3notes[0].gameObject;
+        m_lane3notes.Remove(m_lane3notes[0]);
+        Destroy(obj);
     }
 
     void ReactLane4(InputAction.CallbackContext context)
     {
         //play sound here
-        if (m_lane3notes.Count == 0) return;
-        ScoreEvent?.Invoke(m_lane3notes.Peek().React());
-        Destroy(m_lane3notes.Peek().gameObject);
+        if (m_lane4notes.Count == 0) return;
+        ScoreEvent?.Invoke(m_lane4notes[0].React());
+        GameObject obj = m_lane4notes[0].gameObject;
+        m_lane4notes.Remove(m_lane4notes[0]);
+        Destroy(obj);
+
     }
+
     private void OnTriggerEnter(Collider other)
     {
-        
         NoteFunctionality note;
         other.gameObject.TryGetComponent<NoteFunctionality>(out note);
         
         switch(note.GetLaneNo())
         {
             case 1:
-                m_lane1notes.Enqueue(note);
+                m_lane1notes.Add(note);
                 break;
             case 2:
-                m_lane2notes.Enqueue(note);
+                m_lane2notes.Add(note);
                 break;
             case 3:
-                m_lane3notes.Enqueue(note);
+                m_lane3notes.Add(note);
                 break;
             case 4:
-                m_lane4notes.Enqueue(note);
+                m_lane4notes.Add(note);
                 break;
         }
     }
 
     private void OnTriggerExit(Collider other)
     {
-        
+        if (other.IsDestroyed()) return;
+        ScoreEvent?.Invoke(Scores.Miss);
         NoteFunctionality note;
         other.gameObject.TryGetComponent<NoteFunctionality>(out note);
+        
 
         switch (note.GetLaneNo())
         {
             case 1:
-                m_lane1notes.Dequeue();
+                m_lane1notes.Remove(note);
                 break;
             case 2:
-                m_lane2notes.Dequeue();
+                m_lane2notes.Remove(note);
                 break;
             case 3:
-                m_lane3notes.Dequeue();
+                m_lane3notes.Remove(note);
                 break;
             case 4:
-                m_lane4notes.Dequeue();
+                m_lane4notes.Remove(note);
                 break;
         }
     }

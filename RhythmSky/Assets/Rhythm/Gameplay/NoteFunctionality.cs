@@ -27,11 +27,11 @@ public class NoteFunctionality : MonoBehaviour
     public Scores React()
     {
         Debug.Log("react called");
-        if (reactGreen && reactYellow) { return Scores.Great; }
-        else if (reactYellow && reactRed) {  return Scores.Bad;  }
-        else if (reactGreen) {  return Scores.Perfect; }
-        else if (reactYellow) {  return Scores.Good; }
-        else if (reactRed) { return Scores.Miss; }
+        if (reactGreen && reactYellow) { Debug.Log("great"); return Scores.Great; }
+        else if (reactYellow && reactRed) { Debug.Log("bad"); return Scores.Bad;  }
+        else if (reactGreen) { Debug.Log("perfect"); return Scores.Perfect; }
+        else if (reactYellow) { Debug.Log("good"); return Scores.Good; }
+        else if (reactRed) { Debug.Log("miss"); return Scores.Miss; }
         return Scores.Miss;
     }
 
