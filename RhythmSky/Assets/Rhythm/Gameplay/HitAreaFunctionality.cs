@@ -11,6 +11,7 @@ public class HitAreaFunctionality : MonoBehaviour
     List<NoteFunctionality> m_lane2notes;
     List<NoteFunctionality> m_lane3notes;
     List<NoteFunctionality> m_lane4notes;
+    [SerializeField] AudioSource m_inputNoise;
 
     public event System.Action<Scores> ScoreEvent;
 
@@ -21,6 +22,7 @@ public class HitAreaFunctionality : MonoBehaviour
         m_lane3notes = new();
         m_lane4notes = new();
         m_input = GetComponent<PlayerInput>();
+        m_inputNoise = GetComponent<AudioSource>();
         m_input.currentActionMap.FindAction("Lane 1").performed += ReactLane1;
         m_input.currentActionMap.FindAction("Lane 2").performed += ReactLane2;
         m_input.currentActionMap.FindAction("Lane 3").performed += ReactLane3;
@@ -30,6 +32,7 @@ public class HitAreaFunctionality : MonoBehaviour
     void ReactLane1(InputAction.CallbackContext context)
     {
         //play sound here
+        m_inputNoise.Play();
         if (m_lane1notes.Count == 0) return;
         ScoreEvent?.Invoke(m_lane1notes[0].React());
         GameObject obj = m_lane1notes[0].gameObject;
@@ -41,6 +44,7 @@ public class HitAreaFunctionality : MonoBehaviour
     void ReactLane2(InputAction.CallbackContext context)
     {
         //play sound here
+        m_inputNoise.Play();
         if (m_lane2notes.Count == 0) return;
         ScoreEvent?.Invoke(m_lane2notes[0].React());
         GameObject obj = m_lane2notes[0].gameObject;
@@ -50,7 +54,7 @@ public class HitAreaFunctionality : MonoBehaviour
 
     void ReactLane3(InputAction.CallbackContext context)
     {
-        //play sound here
+        m_inputNoise.Play();
         if (m_lane3notes.Count == 0) return;
         ScoreEvent?.Invoke(m_lane3notes[0].React());
         GameObject obj = m_lane3notes[0].gameObject;
@@ -60,7 +64,7 @@ public class HitAreaFunctionality : MonoBehaviour
 
     void ReactLane4(InputAction.CallbackContext context)
     {
-        //play sound here
+        m_inputNoise.Play();
         if (m_lane4notes.Count == 0) return;
         ScoreEvent?.Invoke(m_lane4notes[0].React());
         GameObject obj = m_lane4notes[0].gameObject;
