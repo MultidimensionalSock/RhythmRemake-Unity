@@ -14,6 +14,9 @@ public class SongController : MonoBehaviour
     bool paused = true;
     MidiReader reader;
     PlayerInput m_input;
+    Vector3 forceDirection;
+    [SerializeField] Transform[] puckTransforms;
+    [SerializeField] GameObject moveTowards;
 
     void Start()
     {
@@ -24,6 +27,8 @@ public class SongController : MonoBehaviour
         StartSong();
         source = GetComponent<AudioSource>();
         source.clip = songAudio;
+
+        forceDirection = (moveTowards.transform.position - transform.position).normalized;
     }
 
     public void PauseSong()
@@ -74,21 +79,21 @@ public class SongController : MonoBehaviour
             switch (note.LaneNo)
             {
                 case 1:
-                    noteObject = Instantiate(hitObject, new Vector3(-49.0f, -0.2f, 1.0f), Quaternion.identity);
+                    noteObject = Instantiate(hitObject, puckTransforms[0].position, puckTransforms[0].rotation);
                     break;
                 case 2:
-                    noteObject = Instantiate(hitObject, new Vector3(-49.0f, -0.2f, -1.5f), Quaternion.identity);
+                    noteObject = Instantiate(hitObject, puckTransforms[1].position, puckTransforms[1].rotation);
                     break;
                 case 3:
-                    noteObject = Instantiate(hitObject, new Vector3(-49.0f, -0.2f, -4.0f), Quaternion.identity);
+                    noteObject = Instantiate(hitObject, puckTransforms[2].position, puckTransforms[2].rotation);
                     break;
                 case 4:
-                    noteObject = Instantiate(hitObject, new Vector3(-49.0f, -0.2f, -6.5f), Quaternion.identity);
+                    noteObject = Instantiate(hitObject, puckTransforms[3].position, puckTransforms[3].rotation);
                     break;
             }
             if (noteObject != null)
             {
-                noteObject.GetComponent<Rigidbody>().velocity = new Vector3(puckSpeed, 0, 0);
+                noteObject.GetComponent<Rigidbody>().velocity = forceDirection * puckSpeed;
                 noteObject.GetComponent<Renderer>().material = puckMaterials[note.LaneNo - 1];
                 noteObject.GetComponent<NoteFunctionality>().SetLaneNo(note.LaneNo);
             }
