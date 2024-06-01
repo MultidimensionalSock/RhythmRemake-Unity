@@ -13,14 +13,12 @@ public class SongController : MonoBehaviour
     AudioSource source;
     bool paused = true;
     MidiReader reader;
-    PlayerInput m_input;
     Vector3 forceDirection;
     [SerializeField] Transform[] puckTransforms;
     [SerializeField] GameObject moveTowards;
 
     void Start()
     {
-        m_input = GetComponent<PlayerInput>();
         reader = GetComponent<MidiReader>();
         reader.SetMidiLocation("Assets/Midi/Vocaloid - 1925.mid");
         reader.NoteCall += CreateNote;
