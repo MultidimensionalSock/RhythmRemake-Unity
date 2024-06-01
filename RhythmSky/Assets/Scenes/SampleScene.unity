@@ -865,7 +865,7 @@ GameObject:
   - component: {fileID: 459220931}
   - component: {fileID: 459220930}
   m_Layer: 5
-  m_Name: Image (1)
+  m_Name: radial
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2629,6 +2629,13 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   hitArea: {fileID: 719289086}
   maxHealth: 50
+  emotionState:
+    perfect: {fileID: 21300000, guid: 9ba7b356536378b458f1eb365226b6bd, type: 3}
+    doingGood: {fileID: 21300000, guid: f5e3d098a9f809647b45138f35c06cef, type: 3}
+    couldBeBetter: {fileID: 21300000, guid: d5a3333c22d74b049b87a933be7833e5, type: 3}
+    doingBad: {fileID: 21300000, guid: b1d112a9824991c47be4cdd0deb7ed82, type: 3}
+    missedNote: {fileID: 21300000, guid: f0df8e15c850a1b4e88d85d898a204a7, type: 3}
+    dying: {fileID: 21300000, guid: 5ded4c3270f380148b8c37dd272d4dd4, type: 3}
 --- !u!1 &1318274517
 GameObject:
   m_ObjectHideFlags: 0

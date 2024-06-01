@@ -1,9 +1,21 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
-using UnityEngine.UIElements;
+using UnityEngine.UI;
 using UnityEngine.Windows.Speech;
+
+[Serializable]
+public struct emotions
+{
+    public Sprite perfect;
+    public Sprite doingGood;
+    public Sprite couldBeBetter;
+    public Sprite doingBad;
+    public Sprite missedNote;
+    public Sprite dying;
+}
 
 public class UIController : MonoBehaviour
 {
@@ -19,6 +31,7 @@ public class UIController : MonoBehaviour
     float playerHealth;
     [SerializeField] float maxHealth;
     string textToDiplay;
+    [SerializeField] emotions emotionState;
 
     int perfect = 0;
     int great = 0;
@@ -36,7 +49,8 @@ public class UIController : MonoBehaviour
         comboCountText = transform.GetChild(1).GetChild(1).GetComponent<TextMeshProUGUI>();
         songPercentageText = transform.GetChild(2).GetComponent<TextMeshProUGUI>();
         scoreText = transform.GetChild(3).GetComponent<TextMeshProUGUI>();
-        emotionImage = transform.GetChild(5).GetChild(1).GetComponent<Image>();
+        emotionImage = transform.GetChild(5).GetChild(0).GetComponent<Image>();
+        HealthPercentage = transform.GetChild(4).GetComponent<Image>();
     }
 
     void ScoreRecieved(Scores score)
@@ -78,23 +92,85 @@ public class UIController : MonoBehaviour
         }
 
         //set all text on UI
-        Debug.Log(playerScore);
         scoreText.text = playerScore.ToString();
         scoreRankingText.text = textToDiplay;
         comboCountText.text = playerCombo.ToString();
-        //emotionImage.image = EmotionReact(score);
+        HealthPercentage.fillAmount = CalculateHealth();
+        EmotionReact(score);
         songPercentageText.text = PercentageCalculate().ToString();
         
     }
 
-    Texture EmotionReact(Scores score)
+    void EmotionReact(Scores score)
     {
-        return null;
+        switch (score)
+        {
+            case Scores.Perfect:
+                if (playerHealth > maxHealth * 0.8)
+                {
+                    emotionImage.overrideSprite = emotionState.perfect;
+                }
+                else
+                {
+                    emotionImage.overrideSprite = emotionState.doingGood;
+                }
+                return;
+            case Scores.Great:
+                if (playerHealth > maxHealth * 0.3)
+                {
+                    emotionImage.overrideSprite = emotionState.doingGood;
+                }
+                else
+                {
+                    emotionImage.overrideSprite = emotionState.couldBeBetter;
+                }
+                return;
+            case Scores.Good:
+                if (playerHealth > maxHealth * 0.3)
+                {
+                    emotionImage.overrideSprite = emotionState.couldBeBetter;
+                    
+                }
+                else
+                {
+                    emotionImage.overrideSprite = emotionState.doingBad;
+                }
+                return;
+            case Scores.Bad:
+                if (playerHealth > maxHealth * 0.3)
+                {
+                    emotionImage.overrideSprite = emotionState.doingBad;
+                }
+                else
+                {
+                    emotionImage.overrideSprite = emotionState.missedNote;
+                }
+                return;
+            case Scores.Miss:
+                if (playerHealth > maxHealth * 0.3)
+                {
+                    emotionImage.overrideSprite = emotionState.missedNote;
+                }
+                else
+                {
+                    emotionImage.overrideSprite = emotionState.dying;
+                }
+                return;
+            default:
+                return;
+        }
+    }
+        
+    
+
+    float CalculateHealth()
+    {
+        return (playerHealth / maxHealth) * 0.25f;
     }
 
     float PercentageCalculate()
     {
-        //reduce to 2 decimal places
+        
         return 0f;
     }
 }
