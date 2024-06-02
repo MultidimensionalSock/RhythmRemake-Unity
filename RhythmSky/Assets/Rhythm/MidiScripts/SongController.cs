@@ -20,12 +20,13 @@ public class SongController : MonoBehaviour
     void OnEnable()
     {
         reader = GetComponent<MidiReader>();
-        reader.MidiLoaded += StartSong;
-        reader.SetMidiLocation("Assets/Midi/tawagoto_speaker_uta.mid");
+        float beforetime = Time.timeSinceLevelLoad;
+
+        float distanceToTravel = (transform.position - moveTowards.transform.position).magnitude;
+        reader.SetNoteDelay( distanceToTravel / puckSpeed);
+        reader.SetSongData("Assets/Midi/tawagoto_speaker_uta.mid", songAudio);
+        
         reader.NoteCall += CreateNote;
-        //StartSong();
-        source = GetComponent<AudioSource>();
-        source.clip = songAudio;
 
         forceDirection = (moveTowards.transform.position - transform.position).normalized;
     }
@@ -38,9 +39,8 @@ public class SongController : MonoBehaviour
 
     public void StartSong()
     {
-        StartCoroutine(startSongAudio());
+        paused = false;
         reader.StartSong();
-        
     }
 
     private void FixedUpdate()
@@ -53,21 +53,6 @@ public class SongController : MonoBehaviour
                 //end song and show score UI
             }
         }
-    }
-
-    IEnumerator startSongAudio()
-    {
-        float beforetime = Time.timeSinceLevelLoad;
-        Vector3 hitPointPos = transform.parent.GetChild(11).position;
-        Vector3 spawnPosition = transform.parent.GetChild(10).position;
-
-        float distanceToTravel = (spawnPosition - hitPointPos).magnitude;
-        float time = distanceToTravel / puckSpeed;
-
-        yield return new WaitForSeconds(time - (beforetime - Time.timeSinceLevelLoad) + 1f);
-
-        source.Play();
-        paused = false;
     }
 
     void CreateNote(List<NoteData> notes)

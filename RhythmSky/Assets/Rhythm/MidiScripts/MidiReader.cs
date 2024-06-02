@@ -45,7 +45,9 @@ public class MidiReader : MonoBehaviour
     public List<List<NoteData>> songData;
     Coroutine songCoroutine;
     bool loaded = false;
-
+    AudioClip songAudio;
+    float noteDelay = 0f;
+    float songStartTime  = 0f;
     
     NoteName[] lane1Notes = { NoteName.G, NoteName.E, NoteName.B };
     NoteName[] lane2Notes = { NoteName.C, NoteName.GSharp, NoteName.ASharp };
@@ -54,7 +56,9 @@ public class MidiReader : MonoBehaviour
 
     public event System.Action<List<NoteData>> NoteCall;
     public event System.Action MidiLoaded;
-    int BeatValue = 1;
+    int BeatValue = 0;
+
+    public void SetNoteDelay(float delay) { noteDelay = delay; }
 
     public void StartSong() 
     { 
@@ -63,9 +67,10 @@ public class MidiReader : MonoBehaviour
     public void RestartSong() { BeatValue = 1; StartSong(); }
     public void PauseSong() { StopCoroutine(songCoroutine); }
 
-    public void SetMidiLocation(string location)
+    public void SetSongData(string midilocation, AudioClip songAudio)
     {
-        midiFile = MidiFile.Read(location);
+        midiFile = MidiFile.Read(midilocation);
+        GetComponent<AudioSource>().clip = songAudio;
         tempoMap = midiFile.GetTempoMap();
         //songAudio = song;
         ReadMidiFile();
@@ -97,8 +102,8 @@ public class MidiReader : MonoBehaviour
             GetNotes();
             
             loaded = true;
-            MidiLoaded?.Invoke();
         }
+        StartSong();
     }
 
     void GetNotes()
@@ -140,6 +145,8 @@ public class MidiReader : MonoBehaviour
             Debug.LogWarning("Song data is null or empty, check if the midi file has been properly passed in");
             yield break;
         }
+        songStartTime = (float)AudioSettings.dspTime;
+        GetComponent<AudioSource>().PlayDelayed((float)AudioSettings.dspTime - songStartTime + noteDelay);
         while (BeatValue < songsegments)
         {
             yield return new WaitForSeconds(60f / BPM);
