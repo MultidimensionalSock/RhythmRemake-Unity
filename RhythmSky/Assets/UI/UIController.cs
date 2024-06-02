@@ -45,7 +45,7 @@ public class UIController : MonoBehaviour
     private void OnEnable()
     {
         hitArea.ScoreEvent += ScoreRecieved;
-        scoreRankingText = transform.GetChild(0).GetComponent<TextMeshProUGUI>();
+        //scoreRankingText = transform.GetChild(0).GetComponent<TextMeshProUGUI>();
         comboCountText = transform.GetChild(1).GetChild(1).GetComponent<TextMeshProUGUI>();
         songPercentageText = transform.GetChild(2).GetComponent<TextMeshProUGUI>();
         scoreText = transform.GetChild(3).GetComponent<TextMeshProUGUI>();
@@ -93,7 +93,7 @@ public class UIController : MonoBehaviour
 
         //set all text on UI
         scoreText.text = playerScore.ToString();
-        scoreRankingText.text = textToDiplay;
+        //scoreRankingText.text = textToDiplay;
         comboCountText.text = playerCombo.ToString();
         HealthPercentage.fillAmount = CalculateHealth();
         EmotionReact(score);

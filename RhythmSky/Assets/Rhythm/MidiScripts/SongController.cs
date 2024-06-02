@@ -17,12 +17,13 @@ public class SongController : MonoBehaviour
     [SerializeField] Transform[] puckTransforms;
     [SerializeField] GameObject moveTowards;
 
-    void Start()
+    void OnEnable()
     {
         reader = GetComponent<MidiReader>();
-        reader.SetMidiLocation("Assets/Midi/Vocaloid - 1925.mid");
+        reader.MidiLoaded += StartSong;
+        reader.SetMidiLocation("Assets/Midi/tawagoto_speaker_uta.mid");
         reader.NoteCall += CreateNote;
-        StartSong();
+        //StartSong();
         source = GetComponent<AudioSource>();
         source.clip = songAudio;
 
@@ -37,8 +38,9 @@ public class SongController : MonoBehaviour
 
     public void StartSong()
     {
-        reader.StartSong();
         StartCoroutine(startSongAudio());
+        reader.StartSong();
+        
     }
 
     private void FixedUpdate()
@@ -56,14 +58,14 @@ public class SongController : MonoBehaviour
     IEnumerator startSongAudio()
     {
         float beforetime = Time.timeSinceLevelLoad;
-        float hitPointPos = transform.parent.GetChild(5).position.x;
-        //should change this to not be hard coded
-        float spawnPosition = -49;
+        Vector3 hitPointPos = transform.parent.GetChild(11).position;
+        Vector3 spawnPosition = transform.parent.GetChild(10).position;
 
-        float distanceToTravel = Mathf.Abs(spawnPosition - hitPointPos);
+        float distanceToTravel = (spawnPosition - hitPointPos).magnitude;
         float time = distanceToTravel / puckSpeed;
 
-        yield return new WaitForSeconds(time - (Time.timeSinceLevelLoad - beforetime));
+        yield return new WaitForSeconds(time - (beforetime - Time.timeSinceLevelLoad) + 1f);
+
         source.Play();
         paused = false;
     }
@@ -73,7 +75,6 @@ public class SongController : MonoBehaviour
         foreach (NoteData note in notes)
         {
             GameObject noteObject = null;
-            //should change the below to not be hard coded
             switch (note.LaneNo)
             {
                 case 1:

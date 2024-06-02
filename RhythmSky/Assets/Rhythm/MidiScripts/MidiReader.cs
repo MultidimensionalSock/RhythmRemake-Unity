@@ -53,6 +53,7 @@ public class MidiReader : MonoBehaviour
     NoteName[] lane4Notes = { NoteName.A, NoteName.CSharp, NoteName.DSharp };
 
     public event System.Action<List<NoteData>> NoteCall;
+    public event System.Action MidiLoaded;
     int BeatValue = 1;
 
     public void StartSong() 
@@ -96,6 +97,7 @@ public class MidiReader : MonoBehaviour
             GetNotes();
             
             loaded = true;
+            MidiLoaded?.Invoke();
         }
     }
 
