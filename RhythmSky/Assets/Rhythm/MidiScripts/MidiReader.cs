@@ -151,15 +151,16 @@ public class MidiReader : MonoBehaviour
         {
             float currentSongPos =(float)AudioSettings.dspTime - songStartTime;
             float currentActualPos = BeatValue * (60f / BPM);
-            float lag =  currentSongPos - currentActualPos;
+            float lag = currentSongPos - currentActualPos;
             yield return new WaitForSeconds(60f / BPM - lag);
             if (songData[BeatValue] != null)
             {
                 NoteCall?.Invoke(songData[BeatValue]);
             }
             BeatValue++;
-            //event to say song has ended needs to go here 
+            
         }
+        //event to say song has ended needs to go here 
     }
     int calculateLaneNumber(Melanchall.DryWetMidi.Interaction.Note note)
     {
