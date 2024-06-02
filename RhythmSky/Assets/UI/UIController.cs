@@ -19,7 +19,7 @@ public struct emotions
 
 public class UIController : MonoBehaviour
 {
-    TextMeshProUGUI scoreRankingText; //perfect, great, good, etc
+    GameObject[] scoreRankingText; //perfect, great, good, etc
     TextMeshProUGUI comboCountText; //how many notes hit in a row
     TextMeshProUGUI songPercentageText;
     TextMeshProUGUI scoreText;
@@ -33,6 +33,7 @@ public class UIController : MonoBehaviour
     string textToDiplay;
     [SerializeField] emotions emotionState;
 
+
     int perfect = 0;
     int great = 0;
     int good = 0;
@@ -45,7 +46,12 @@ public class UIController : MonoBehaviour
     private void OnEnable()
     {
         hitArea.ScoreEvent += ScoreRecieved;
-        //scoreRankingText = transform.GetChild(0).GetComponent<TextMeshProUGUI>();
+        List<GameObject> list = new List<GameObject>();
+        for (int i = 0; i < transform.GetChild(0).childCount; i++)
+        {
+            list.Add(transform.GetChild(0).GetChild(i).gameObject) ;
+        }
+        scoreRankingText = list.ToArray();
         comboCountText = transform.GetChild(1).GetChild(1).GetComponent<TextMeshProUGUI>();
         songPercentageText = transform.GetChild(2).GetComponent<TextMeshProUGUI>();
         scoreText = transform.GetChild(3).GetComponent<TextMeshProUGUI>();
@@ -55,37 +61,44 @@ public class UIController : MonoBehaviour
 
     void ScoreRecieved(Scores score)
     {
+        int indexScore = 0;
         switch (score)
         {
             case Scores.Perfect:
                 perfect++;
-                textToDiplay = "Perfect";
+                //textToDiplay = "Perfect";
+                indexScore = 0;
+                scoreRankingText[0].gameObject.SetActive(true);
                 playerHealth += 2;
                 playerCombo++;
                 playerScore += 500f * ((playerCombo / 100) + 1);
                 break;
             case Scores.Great:
                 great++;
-                textToDiplay = "Great";
+                //textToDiplay = "Great";
+                indexScore = 1;
                 playerHealth += 1;
                 playerCombo++;
                 playerScore += 250f * ((playerCombo / 100) + 1);
                 break;
             case Scores.Good:
                 good++;
-                textToDiplay = "Good";
+                //textToDiplay = "Good";
+                indexScore = 2;
                 playerCombo = 0;
                 playerScore += 100f;
                 break;
             case Scores.Bad:
                 bad++;
-                textToDiplay = "Bad";
+                //textToDiplay = "Bad";
+                indexScore = 3;
                 playerHealth -= 1;
                 playerCombo = 0;
                 break;
             case Scores.Miss:
                 miss++;
-                textToDiplay = "Miss";
+                //textToDiplay = "Miss";
+                indexScore = 4;
                 playerCombo = 0;
                 playerHealth -= 2;
                 break;
@@ -93,7 +106,8 @@ public class UIController : MonoBehaviour
 
         //set all text on UI
         scoreText.text = playerScore.ToString();
-        //scoreRankingText.text = textToDiplay;
+        HideAllTextUI();
+        scoreRankingText[indexScore].SetActive(true);
         comboCountText.text = playerCombo.ToString();
         HealthPercentage.fillAmount = CalculateHealth();
         EmotionReact(score);
@@ -172,5 +186,13 @@ public class UIController : MonoBehaviour
     {
         
         return 0f;
+    }
+
+    void HideAllTextUI()
+    {
+        foreach (GameObject scoreTex in scoreRankingText)
+        {
+            scoreTex.SetActive(false);
+        }
     }
 }
