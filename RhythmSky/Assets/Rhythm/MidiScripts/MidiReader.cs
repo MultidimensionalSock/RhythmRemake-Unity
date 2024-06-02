@@ -146,10 +146,13 @@ public class MidiReader : MonoBehaviour
             yield break;
         }
         songStartTime = (float)AudioSettings.dspTime;
-        GetComponent<AudioSource>().PlayDelayed((float)AudioSettings.dspTime - songStartTime + noteDelay);
+        GetComponent<AudioSource>().PlayDelayed(((float)AudioSettings.dspTime - songStartTime + noteDelay));
         while (BeatValue < songsegments)
         {
-            yield return new WaitForSeconds(60f / BPM);
+            float currentSongPos =(float)AudioSettings.dspTime - songStartTime;
+            float currentActualPos = BeatValue * (60f / BPM);
+            float lag =  currentSongPos - currentActualPos;
+            yield return new WaitForSeconds(60f / BPM - lag);
             if (songData[BeatValue] != null)
             {
                 NoteCall?.Invoke(songData[BeatValue]);
