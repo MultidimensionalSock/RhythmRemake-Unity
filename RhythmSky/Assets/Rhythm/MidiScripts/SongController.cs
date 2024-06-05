@@ -25,7 +25,7 @@ public class SongController : MonoBehaviour
 
         float distanceToTravel = (transform.position - moveTowards.transform.position).magnitude;
         reader.SetNoteDelay(distanceToTravel / puckSpeed);
-        reader.SetSongData("Assets/Midi/tawagoto_speaker_uta.mid", songAudio);
+        reader.SetSongData("Assets/Midi/no name(2).mid", songAudio);
         
         reader.NoteCall += CreateNote;
 
