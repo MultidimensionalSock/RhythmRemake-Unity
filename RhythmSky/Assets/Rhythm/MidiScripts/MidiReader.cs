@@ -45,7 +45,6 @@ public class MidiReader : MonoBehaviour
     public List<List<NoteData>> songData;
     Coroutine songCoroutine;
     bool loaded = false;
-    AudioClip songAudio;
     float noteDelay = 0f;
     float songStartTime  = 0f;
     
@@ -57,6 +56,13 @@ public class MidiReader : MonoBehaviour
     public event System.Action<List<NoteData>> NoteCall;
     public event System.Action MidiLoaded;
     int BeatValue = 0;
+
+    SongController controller;
+
+    private void OnEnable()
+    {
+        controller = GetComponent<SongController>();
+    }
 
     public void SetNoteDelay(float delay) { noteDelay = delay; }
 
@@ -72,7 +78,6 @@ public class MidiReader : MonoBehaviour
         midiFile = MidiFile.Read(midilocation);
         GetComponent<AudioSource>().clip = songAudio;
         tempoMap = midiFile.GetTempoMap();
-        //songAudio = song;
         ReadMidiFile();
     }
 
@@ -149,18 +154,20 @@ public class MidiReader : MonoBehaviour
         GetComponent<AudioSource>().PlayDelayed(((float)AudioSettings.dspTime - songStartTime + noteDelay));
         while (BeatValue < songsegments)
         {
-            float currentSongPos =(float)AudioSettings.dspTime - songStartTime;
+            float currentSongPos = (float)AudioSettings.dspTime - songStartTime;
             float currentActualPos = BeatValue * (60f / BPM);
             float lag = currentSongPos - currentActualPos;
             yield return new WaitForSeconds(60f / BPM - lag);
             if (songData[BeatValue] != null)
             {
-                NoteCall?.Invoke(songData[BeatValue]);
+                controller.CreateNote(songData[BeatValue]);
+                //NoteCall?.Invoke(songData[BeatValue]);
             }
             BeatValue++;
-            
         }
         //event to say song has ended needs to go here 
+
+        
     }
     int calculateLaneNumber(Melanchall.DryWetMidi.Interaction.Note note)
     {

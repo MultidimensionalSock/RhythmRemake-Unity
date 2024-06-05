@@ -56,7 +56,7 @@ public class SongController : MonoBehaviour
         }
     }
 
-    void CreateNote(List<NoteData> notes)
+    public void CreateNote(List<NoteData> notes)
     {
         foreach (NoteData note in notes)
         {
