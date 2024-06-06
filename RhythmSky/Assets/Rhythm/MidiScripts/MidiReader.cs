@@ -4,10 +4,7 @@ using Melanchall.DryWetMidi.MusicTheory;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using Unity.PlasticSCM.Editor.WebApi;
 using Unity.VisualScripting;
-using UnityEditor.Experimental.GraphView;
-using UnityEditor.SceneManagement;
 using UnityEngine;
 
 //need a way to decide how many notes you want to be able to work at one time 
@@ -54,6 +51,7 @@ public class MidiReader : MonoBehaviour
     NoteName[] lane4Notes = { NoteName.A, NoteName.CSharp, NoteName.DSharp };
 
     public event System.Action<List<NoteData>> NoteCall;
+    public event System.Action EndSong;
     public event System.Action MidiLoaded;
     int BeatValue = 0;
 
@@ -63,6 +61,7 @@ public class MidiReader : MonoBehaviour
     {
         controller = GetComponent<SongController>();
     }
+
 
     public void SetNoteDelay(float delay) { noteDelay = delay; }
 
@@ -165,7 +164,8 @@ public class MidiReader : MonoBehaviour
             }
             BeatValue++;
         }
-        //event to say song has ended needs to go here 
+        yield return new WaitForSeconds(noteDelay);
+        EndSong?.Invoke();
 
         
     }

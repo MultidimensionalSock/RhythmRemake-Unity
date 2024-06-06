@@ -32,7 +32,7 @@ public class UIController : MonoBehaviour
     [SerializeField] float maxHealth;
     string textToDiplay;
     [SerializeField] emotions emotionState;
-
+    [SerializeField] MidiReader reader;
 
     int perfect = 0;
     int great = 0;
@@ -46,6 +46,7 @@ public class UIController : MonoBehaviour
     private void OnEnable()
     {
         hitArea.ScoreEvent += ScoreRecieved;
+        reader.EndSong += EndSongUI;
         List<GameObject> list = new List<GameObject>();
         for (int i = 0; i < transform.GetChild(0).childCount; i++)
         {
@@ -57,6 +58,18 @@ public class UIController : MonoBehaviour
         scoreText = transform.GetChild(3).GetComponent<TextMeshProUGUI>();
         emotionImage = transform.GetChild(5).GetChild(0).GetComponent<Image>();
         HealthPercentage = transform.GetChild(4).GetComponent<Image>();
+    }
+
+    void EndSongUI()
+    {
+        GameObject endSongUI = transform.GetChild(7).gameObject;
+        endSongUI.transform.GetChild(1).GetComponent<TextMeshProUGUI>().text = perfect.ToString();
+        endSongUI.transform.GetChild(2).GetComponent<TextMeshProUGUI>().text = great.ToString();
+        endSongUI.transform.GetChild(3).GetComponent<TextMeshProUGUI>().text = good.ToString();
+        endSongUI.transform.GetChild(4).GetComponent<TextMeshProUGUI>().text = bad.ToString();
+        endSongUI.transform.GetChild(5).GetComponent<TextMeshProUGUI>().text = miss.ToString();
+        endSongUI.SetActive(true);
+
     }
 
     void ScoreRecieved(Scores score)
